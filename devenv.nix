@@ -3,10 +3,21 @@
 {
   cachix.enable = false;
 
+  env.WP_VERSION = "6.8.2";
+  env.WP_SHA1 = "03baad10b8f9a416a3e10b89010d811d9361e468";
+
   packages = with pkgs; [
     pkgs.git
     pkgs.wp-cli
   ];
+
+  enterShell = ''
+    echo "Fetching WordPress ${config.env.WP_VERSION}..."
+    curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${config.env.  WP_VERSION}.tar.gz \
+      && echo "${config.env.WP_SHA1} *wordpress.tar.gz" | sha1sum -c - \
+      && tar xzf wordpress.tar.gz -C ./wordpress \
+      && rm wordpress.tar.gz
+  '';
 
   languages.php = {
     enable = true;
@@ -37,7 +48,7 @@
   ];
 
   scripts.caddy-setcap.exec = ''
-    sudo setcap 'cap_net_bind_service' ${pkgs.caddy}/bin/caddy
+    sudo setcap 'cap_net_bind_service=+ep' ${pkgs.caddy}/bin/caddy
   '';
 
   services = {
@@ -61,7 +72,7 @@
       virtualHosts."wp.localhost" = {
         extraConfig = ''
           tls ${config.env.DEVENV_STATE}/mkcert/wp.localhost.pem ${config.env.DEVENV_STATE}/mkcert/wp.localhost-key.pem
-          root * .
+          root * ./wordpress
           php_fastcgi unix/${config.languages.php.fpm.pools.web.socket}
           file_server
         '';
