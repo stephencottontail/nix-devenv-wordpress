@@ -13,15 +13,15 @@
   ];
 
   enterShell = ''
-    if [ -f wordpress.tar.gz ]; then
+    if [ -f wordpress-${config.env.WP_VERSION}.tar.gz ]; then
       echo "WordPress already installed, skipping..."
       return
     fi
 
     echo "Fetching WordPress ${config.env.WP_VERSION}..."
-    curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${config.env.  WP_VERSION}.tar.gz \
-      && echo "${config.env.WP_SHA1} *wordpress.tar.gz" | sha1sum -c - \
-      && tar xzf wordpress.tar.gz -C ./wordpress \
+    curl -o wordpress-${config.env.WP_VERSION}.tar.gz -SL https://wordpress.org/wordpress-${config.env.  WP_VERSION}.tar.gz \
+      && echo "${config.env.WP_SHA1} *wordpress-${config.env.WP_VERSION}.tar.gz" | sha1sum -c - \
+      && tar xzf wordpress-${config.env.WP_VERSION}.tar.gz -C ./wordpress \
       && echo "WordPress ${config.env.WP_VERSION} installed"
   '';
 

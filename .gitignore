@@ -11,4 +11,4 @@ devenv.local.nix
 # WordPress
 wordpress/
 wordpress/**
-wordpress.tar.gz
+wordpress-*.tar.gz
