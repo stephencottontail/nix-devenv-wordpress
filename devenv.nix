@@ -9,14 +9,20 @@
   packages = with pkgs; [
     pkgs.git
     pkgs.wp-cli
+    pkgs.nodejs_24
   ];
 
   enterShell = ''
+    if [ -f wordpress.tar.gz ]; then
+      echo "WordPress already installed, skipping..."
+      return
+    fi
+
     echo "Fetching WordPress ${config.env.WP_VERSION}..."
     curl -o wordpress.tar.gz -SL https://wordpress.org/wordpress-${config.env.  WP_VERSION}.tar.gz \
       && echo "${config.env.WP_SHA1} *wordpress.tar.gz" | sha1sum -c - \
       && tar xzf wordpress.tar.gz -C ./wordpress \
-      && rm wordpress.tar.gz
+      && echo "WordPress ${config.env.WP_VERSION} installed"
   '';
 
   languages.php = {
@@ -61,7 +67,7 @@
       };
       ensureUsers = [
         {
-          name = "wordpress";
+          name = "stephen";
           password = "wordpress";
           ensurePermissions = { "wp.*" = "ALL PRIVILEGES"; };
         } 
